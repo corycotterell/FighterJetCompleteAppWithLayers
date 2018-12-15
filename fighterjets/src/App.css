@@ -1,0 +1,40 @@
+
+html, body {
+  height: 100%;
+}
+
+.root{
+  background: #333;
+  color: #fff;
+
+
+}
+
+.btn-secondary {
+  color: red;
+}
+
+.card {
+  width: 50%;
+  margin: 0 auto;
+  margin-bottom: 15px;
+}
+
+.App {
+  text-align: center;
+  background: #333;
+}
+
+.btn-primary{
+  margin-top: 10px;
+}
+h2.change-color {
+  color: orangered;
+}
+img {
+  padding-right: 20% !important;
+  /* border-image-width: 50% */
+}
+
+
+
