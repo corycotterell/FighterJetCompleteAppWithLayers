@@ -19,3 +19,8 @@ const Route = use('Route')
 Route.get('/test', () => {
   return { greeting: 'Hello world in JSON' }
 })
+Route.get('/findManufacturer/:id', 'FighterjetController.getJetsByManufacturer')
+Route.get('/jets', 'FighterjetController.getFighterJets')
+Route.post('/create', 'FighterjetController.createFighterJet')
+Route.put('/update/:id', "FighterjetController.updateFighterJet")
+Route.delete('/delete/:id', 'FighterJetController.deleteFighterJetById')

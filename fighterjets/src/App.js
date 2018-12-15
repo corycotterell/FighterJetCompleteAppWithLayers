@@ -16,7 +16,7 @@ const Main = () => {
       <h2 className="change-color">
         Welcome to the Danger Zone!
       </h2>
-    <img src='https://images.pexels.com/photos/76971/fighter-jet-fighter-aircraft-f-16-falcon-aircraft-76971.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260'></img>
+  
 </React.Fragment>
 )}
 
@@ -25,64 +25,18 @@ const Main = () => {
 class App extends Component {
   constructor(props){
     super(props)
-    console.log(props)
-   var local = localStorage.getItem('data')
-   console.log(local)
-      if(local){
-      
-        this.state={data: JSON.parse(local)};
-      }
-      else {
-      
-    this.state = {data:[
-      {
-      name: "F84 Thunderjet",
-      make: "Republic  Aviation",
-      topSpeed: "622 MPH",
-      weapons:  "6 x .50 in M3 Browning machine guns",
-      id: 0,
-                },
-      {
-      name: "F86 Sabre",
-      make: "North American Aviation",
-      topSpeed: "685 MPH",
-      weapons:  " 6 X 0.50 in (12.7 mm) M3 Browning machine guns (1,800 rounds in total)",
-      id: 1,     
-      },
-      {
-      name: "F100 Super Sabre",
-      make: "North American Aviation",
-      topSpeed: "864 MPH",
-      weapons:  "4× 20 mm (0.787 in) Pontiac M39A1 revolver cannon w/ 200 rpg",
-      id: 2,           
-              
-      },
-      {
-      name: "F4 Phantom 2",
-      make: "McDonald Douglas",
-      topSpeed: "1,473 MPH",
-      weapons:  "E-model has a 20 mm (0.787 in) M61A1 Vulcan cannon mounted internally under the nose, 640 Rounds",
-      id: 3,           
-              
-      }
-  ]
-}
-};
-  
-  
-//   localStorage.setItem( 'car', JSON.stringify(car) );
-// console.log( JSON.parse( localStorage.getItem( 'car' ) ) );
-  
-
-  
+    this.state = {
+      data:{model:"hey"}
+    }
   this.create = this.create.bind(this);
   this.delete = this.delete.bind(this);
-  this.update = this.update.bind(this);
-  
-  }
+  this.update = this.update.bind(this); 
+}
   componentDidMount(){
-    axios.get("/test").then(()=>{
-      
+    axios.get("/jets").then((obj)=>{
+      this.setState({
+        data:obj.data.data[0]
+      })
     })
   }
   create(obj){
@@ -134,7 +88,8 @@ class App extends Component {
     console.log(this.state)
     return (
       <Router>
-      <div className="App">
+        <h1>{this.state.data.model}</h1>
+      {/* <div className="App">
       <ShowTheLocation fighterObj={this.state.data}/>
         <ul>
           <li>
@@ -148,13 +103,10 @@ class App extends Component {
           </li>
 
         </ul>
-
-        {/* <CardGenerator update={this.update} delete={this.delete} fighterData={this.state.data}/> */}
-        {/* <GetNewData create={this.create}/> */}
         <Route path="/Fighter-Jets" component={props => <CardGenerator {...props} update={this.update} delete={this.delete} fighterData={this.state.data} />} ></Route>
         <Route path="/Welcome-to-the-Danger-Zone" component={Main}></Route>
         <Route path="/Submit-Fighter-Jet" component={props => <GetNewData{...props} create={this.create}/> }/>
-      </div>
+      </div> */}
       </Router>
     );
   }
