@@ -26,7 +26,7 @@ class App extends Component {
   constructor(props){
     super(props)
     this.state = {
-      data:{model:"hey"}
+      data:[]
     }
   this.create = this.create.bind(this);
   this.delete = this.delete.bind(this);
@@ -35,12 +35,12 @@ class App extends Component {
   componentDidMount(){
     axios.get("/jets").then((obj)=>{
       this.setState({
-        data:obj.data.data[0]
+        data:obj.data.data
       })
     })
   }
   create(obj){
-    console.log(this.state.data);
+    //console.log(this.state.data);
     this.setState({
       data: this.state.data.concat([{...obj,id:this.state.data.length}])
     })
@@ -88,7 +88,6 @@ class App extends Component {
     console.log(this.state)
     return (
       <Router>
-        <h1>{this.state.data.model}</h1>
       {/* <div className="App">
       <ShowTheLocation fighterObj={this.state.data}/>
         <ul>
@@ -106,7 +105,11 @@ class App extends Component {
         <Route path="/Fighter-Jets" component={props => <CardGenerator {...props} update={this.update} delete={this.delete} fighterData={this.state.data} />} ></Route>
         <Route path="/Welcome-to-the-Danger-Zone" component={Main}></Route>
         <Route path="/Submit-Fighter-Jet" component={props => <GetNewData{...props} create={this.create}/> }/>
+        
       </div> */}
+      <div>
+      <Route path="/fighter" component={props => <CardGenerator fighterData={this.state.data || []} />} ></Route>
+      </div>
       </Router>
     );
   }
