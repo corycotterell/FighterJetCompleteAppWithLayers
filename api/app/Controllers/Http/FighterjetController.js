@@ -47,7 +47,7 @@ class FighterjetController {
     }
 
     async deleteFighterJetById({request, response, params}){
-      const {id} = params
+      const {id} = request.all()
       const jets = await Jet.find(id)
       jets.delete()
       response.json({

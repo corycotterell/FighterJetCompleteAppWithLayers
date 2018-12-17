@@ -8,29 +8,31 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import ShowTheLocation from "./location.js"
 import axios from "axios"
-
-const Home = () => <h2>Home</h2>;
-const Main = () => {
-  return (
-    <React.Fragment>
-      <h2 className="change-color">
-        Welcome to the Danger Zone!
-      </h2>
-  
-</React.Fragment>
-)}
-
+import ModalEditor from "./ModalEditor.js"
   
 
 class App extends Component {
   constructor(props){
     super(props)
     this.state = {
-      data:[]
+      data:[],
+      currentEvent:"read",
+      editingJetData:{
+        model: '',
+        top_speed: '',
+        primary_fire: '',
+        manufacturer_id: null
+      },
+      isOpen: false
     }
+  this.updateInputValue = this.updateInputValue.bind(this);
   this.create = this.create.bind(this);
-  this.delete = this.delete.bind(this);
-  this.update = this.update.bind(this); 
+ 
+  //this.update = this.update.bind(this); 
+  this.toggleOpen = this.toggleOpen.bind(this);
+  this.toggleClose = this.toggleClose.bind(this);
+  this.updateHandler = this.updateHandler.bind(this);
+  this.deleteHandler = this.deleteHandler.bind(this);
 }
   componentDidMount(){
     axios.get("/jets").then((obj)=>{
@@ -39,78 +41,148 @@ class App extends Component {
       })
     })
   }
-  create(obj){
-    //console.log(this.state.data);
+
+  // toggle() {
+  //   this.setState({
+  //     modal: !this.state.modal,
+  //     isOpen: true
+  //   });
+  // }
+
+  toggleOpen(jetData){
+    return e => {
     this.setState({
-      data: this.state.data.concat([{...obj,id:this.state.data.length}])
+      isOpen: true,
+      currentEvent: "update",
+      editingJetData:jetData
     })
- 
-  
-   
   }
-  delete(fighterJetName){
-      this.setState({data: this.state.data.filter((fighterJet)=> {
-          if(fighterJetName === fighterJet.name){
-            localStorage.setItem('data',JSON.stringify(this.state.data));
-            return false
-          }else {
-            
-            return true;
-            
-          }
-      })});
-      
   }
 
-
-  update(obj){
-    console.log(obj)
+  toggleClose(){
     this.setState({
-      data: this.state.data.map((element)=>{
-        
-        if(obj.id===element.id){
-          return obj
+      isOpen: false
+    })
+  }
+
+  updateHandler(jet){
+    console.log(jet)
+    return e =>{
+     //console.log(jet.id)
+     if(this.state.currentEvent === "update"){
+      axios.put(`/update/${jet.id}`, jet)
+        .then(()=>axios.get("/jets").then((obj)=>{
+          this.setState({
+            data:obj.data.data
+          })
+        }))
+        this.toggleClose()
+      }else if(this.state.currentEvent === 'create'){
+        axios.post(`/create/`, jet)
+        .then(()=>axios.get("/jets").then((obj)=>{
+          this.setState({
+            data:obj.data.data
+          })
+        }))
         }
-        return element
+  }
+}
+
+
+updateInputValue(obj) {
+  console.log(obj,this.state.editingJetData)
+  let updatedJet = Object.assign(this.state.editingJetData,obj)
+  this.setState({
+    editedJetData: updatedJet
+  })
+}
+  inputForCreate(obj){
+    let newJet = Object.assign(this.state.editingJetData,obj)
+    this.setState({
+      editingJetData:newJet
+    })
+  }
+  create(obj){
+
+    //console.log(this.state.data);
+   
+    this.setState({
+      isOpen: true,
+      currentEvent: "create"
+    })
+  }
+ 
+   
+  
+  deleteHandler(id){
+    return e =>{
+    axios.delete(`/delete/`, {data:{id:id}})
+    .then(()=>axios.get("/jets").then((obj)=>{
+      this.setState({
+        data:obj.data.data
+      })
+    }))
+  }
+  }
+
+
+  // update(obj){
+  //   //.log(obj)
+  //   axios.put(`/update/${obj.id}`, obj)
+  //       .then(this.setState({
+  //     // data: this.state.data.map((element)=>{
+        
+  //     //   if(obj.id===element.id){
+  //     //     return obj
+  //     //   }
+  //     //   return element
        
 
-      }) 
-    })
+  //     // }) 
+  //   }))
+  // } 
     
-    
-  }
+  
 
   
   
   render() {
     localStorage.setItem('data',JSON.stringify(this.state.data));
 
-    console.log(this.state)
+    
     return (
+      <>
+      
+      <ModalEditor 
+      isOpen={this.state.isOpen}
+      toggleOpen={this.toggleOpen} 
+      toggleClose={this.toggleClose}
+      updateInputValue={this.updateInputValue}
+      updateHandler={this.updateHandler}
+      jet={this.state.editingJetData} 
+      currentEvent={this.state.currentEvent}
+      /> 
       <Router>
-      {/* <div className="App">
-      <ShowTheLocation fighterObj={this.state.data}/>
-        <ul>
-          <li>
-            <Link to="/Fighter-Jets">Fighter Jets</Link>
-          </li>
-          <li>
-          <Link to="/Welcome-to-the-Danger-Zone">Welcome to the Danger Zone</Link>
-          </li>
-          <li>
-            <Link to="/Submit-Fighter-Jet">Submit Fighter Jet</Link>
-          </li>
-
-        </ul>
-        <Route path="/Fighter-Jets" component={props => <CardGenerator {...props} update={this.update} delete={this.delete} fighterData={this.state.data} />} ></Route>
-        <Route path="/Welcome-to-the-Danger-Zone" component={Main}></Route>
-        <Route path="/Submit-Fighter-Jet" component={props => <GetNewData{...props} create={this.create}/> }/>
-        
-      </div> */}
       <div>
-      <Route path="/fighter" component={props => <CardGenerator fighterData={this.state.data || []} />} ></Route>
+      <button onClick={this.create}>create</button>
+        <Route path="/add" component={props => <GetNewData
+          create={this.create}
+          updateInputValue={this.updateInputValue}
+          jet={this.state.editingJetData}
+        /> }></Route>
+      <Route path="/fighter" component={props => <CardGenerator
+        toggleOpen={this.toggleOpen} 
+        delete={this.deleteHandler}
+        toggleClose={this.toggleClose} 
+        updateHandler={this.updateHandler} 
+        updateInputValue={this.updateInputValue}
+        fighterData={this.state.data || []} />} >
+      </Route>
+      {/* <ModalEditor toggle={this.toggle} updateHandler={this.updateHandler} update={this.update} /> */}
+      {/* <Route path="/update" component={props => <ModalEditor update={this.update} />} ></Route> */}
       </div>
       </Router>
+      </>
     );
   }
 }
